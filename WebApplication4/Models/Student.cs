@@ -1,10 +1,16 @@
-﻿namespace WebApplication4.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebApplication4.Models
 {
     public class Student
     {
+        [Key]
         public int Id { get; set; }
+
+        [StringLength(50)]
         public string? Name { get; set; }
 
+        [StringLength(30)]
         public string? Branch { get; set; }
 
         public int Batch { get; set; }

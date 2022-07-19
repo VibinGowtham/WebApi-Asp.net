@@ -4,41 +4,66 @@ using WebApplication4.Models;
 namespace WebApplication4.Controllers {
 
     [ApiController]
-    [Route("getDetails")]
+    [Route("[controller]")]
     public class UserController : ControllerBase
     {
-       
-        [Route("")]
+       private  StudentDBContext studentDBContext;
+
+       public UserController(StudentDBContext studentDBContext)
+        {
+            this.studentDBContext = studentDBContext;
+        }
+
+        [Route("getAll")]
         public List<Student> getAll()
         {
-            Student obj = new Student(1, "Vibin", "Cse", 2022, 22);
-            Student obj1 = new Student(2, "Gowtham", "Mech", 2021, 23);
-            Student obj2 = new Student(3, "Akash", "Cse", 2020, 24);
-
-            List<Student> students = new List<Student>();
-            students.Add(obj1);
-            students.Add(obj2);
-            students.Add(obj);
-            return students;
+          return  studentDBContext.Students.ToList();
         }
 
         [Route("{id}")]
         public Student? getDetails(int id)
         {
-          
-
-            List<Student> students = getAll();
-       
-            
-            foreach(Student student in students)
-            {
-                if (student.Id == id) return student;
-
-            }
-
-            return null;
+            return (Student?)studentDBContext.Students.Where(student => student.Id==id);  
         }
 
 
+        [HttpPost("add")]
+        public Student? saveStudent(Student student)
+        {
+            studentDBContext.Students.Add(student);
+            studentDBContext.SaveChanges();
+            return student;
+
+        }
+
+        [HttpPost("update")]
+        public string updateStudent(Student student)
+        {
+            try
+            {
+                studentDBContext.Students.Update(student);
+                studentDBContext.SaveChanges();
+                return "Update Successfull";
+            }
+        catch(Exception e)
+            {
+                return "User Not Found";
+            }
+
+        }
+
+        [HttpPost("delete")]
+        public string deleteStudent(Student obj)
+        {
+       
+              var student =  studentDBContext.Students.Find(obj.Id);
+                if (student != null)
+                {
+                    studentDBContext.Students.Remove(student);
+                    studentDBContext.SaveChanges();
+                return "Deleted Successfully";
+                }
+                else return "User Not Found";    
+        }
     }
 }
